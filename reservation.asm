@@ -11,9 +11,17 @@
 
 ;data segment
 data segment
+    ;strings
     welcomeString db 0ah,0dh,'Welcome to Railway Ticket Reservation System','$'
-data ends
+    trainAName db 0ah,0dh,'Train A'
+    trainBName db 0ah,0dh,'Train B'
+    trainCName db 0ah,0dh,'Train C'
 
+    ;variables to store seating information
+    trainASeats db 3 dup(?)
+    trainBSeats db 3 dup(?)   
+    trainCSeats db 3 dup(?)   
+data ends
     
 ;macro to print strings    
 printString macro arg
@@ -26,8 +34,28 @@ endm
 code segment
 
 start: printString welcomeString
+;print menu
+menu:           
 
-mov ah,21h
+;choose train
+chooseTrain:    ;load train:no into ah register
+
+;choose class
+chooseClass:    ;load class:no into al register
+
+;display remaining seats no
+;read no of seats to book
+;on success, display ticket info
+;       -> go to main menu
+;       -> exit
+
+;if no seats - provide option
+;               -> go to class selection
+;               -> go to main menu
+;               -> exit
+
+exit:           mov ah,4ch
+                int 21h
 
 code ends
 end start
