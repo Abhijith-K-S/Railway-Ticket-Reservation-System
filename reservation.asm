@@ -12,20 +12,24 @@
 ;data segment
 data segment
     ;strings
+    newlineString db 0ah,0dh,' $'  
     welcomeString db 0ah,0dh,'Welcome to Railway Ticket Reservation System','$'   
-    trainMenuString db 0ah,0dh,'Please Select a Train to Book Tickets: $'
-    newlineString db 0ah,0dh,' $'   
-    trainSelection db 0ah,0dh,'Enter Train number :$'                     
-    trainAName db 0ah,0dh,'1:Train A $'
-    trainBName db 0ah,0dh,'2:Train B $'
-    trainCName db 0ah,0dh,'3:Train C $' 
-             
+
+    ;train menu
+    trainMenuString db 0ah,0dh,'Please Select a Train to Book Tickets: $' 
+    trainSelection db 0ah,0dh,'Enter Train number: $'                     
+    trainAName db 0ah,0dh,'1: Train A $'
+    trainBName db 0ah,0dh,'2: Train B $'
+    trainCName db 0ah,0dh,'3: Train C $' 
+
+    ;class menu         
     classMenuString db 0ah,0dh,'Please select a class  $'     
-    classSelection db 0ah,0dh,'Select a class : $'
-    classAName db 0ah,0dh,'1:CLASS A $' 
-    classBName db 0ah,0dh,'2:CLASS B $'
-    classCName db 0ah,0dh,'3:CLASS C $'  
+    classSelection db 0ah,0dh,'Select a class: $'
+    classAName db 0ah,0dh,'1: CLASS A $' 
+    classBName db 0ah,0dh,'2: CLASS B $'
+    classCName db 0ah,0dh,'3: CLASS C $'  
     
+    ;error message
     errorString db 0ah,0dh,'INVALID OPTION.PLEASE TRY AGAIN!!!$'
    
     ;variables to store available seating information
@@ -54,12 +58,13 @@ endm
 code segment
 assume cs:code,ds:data
       
-      start:    mov ax,data
+start:          mov ax,data
                 mov ds,ax
 ;print menu
-       menu:    printString welcomeString  
+menu:           printString welcomeString  
                 printString newlineString
 
+;train menu
                 printString trainMenuString  
                 printString newlineString  
                 printString trainAName
@@ -67,45 +72,45 @@ assume cs:code,ds:data
                 printString trainBName
                 printString newlineString 
                 printString trainCName  
-                printString newlineString 
+chooseTrain:    printString newlineString 
                 printString trainSelection             
 
-;choose train
-chooseTrain:    ;load train:no into currentlyChosenTrain 
-                call readInt 
-                mov currentlyChosenTrain,al
+
+                call readInt                
+;check for errors
+                cmp al,04h
+                jc noErrorTrain
+                printString newlineString
+                printString errorString
+                jmp chooseTrain
 
 ;choose class
- chooseClass: 
- 
-               
-
-            printString newlineString
-            printString classMenuString  
-            printString newlineString  
-            printString classAName
-            printString newlineString
-            printString classBName
-            printString newlineString 
-            printString classCName  
-repeatClass:printString newlineString 
-            printString classSelection 
+ noErrorTrain:  mov currentlyChosenTrain,al
+                
+                printString newlineString
+                printString classMenuString  
+                printString newlineString  
+                printString classAName
+                printString newlineString
+                printString classBName
+                printString newlineString 
+                printString classCName  
+chooseClass:    printString newlineString 
+                printString classSelection 
            
-
-              call readInt 
-              cmp al,04h
-              jc  chooseSeat
-          
-              printString errorString
-              jmp repeatClass
- 
-  
+                call readInt
+;check for errors 
+                cmp al,04h
+                jc noErrorClass
+                printString newlineString
+                printString errorString
+                jmp chooseClass
   
            
-chooseSeat:    
-           mov currentlyChosenClass,al
+noErrorClass:   mov currentlyChosenClass,al
 
-
+                printString newlineString
+                call displaySeats
 
 exit:           mov ah,4ch
                 int 21h 
@@ -144,10 +149,10 @@ classAChosen:   cmp currentlyChosenClass,01h
 
 classBChosen:   cmp currentlyChosenClass,02h
                 jnz classCChosen
-                add si,20h
+                add si,14h
                 jmp chooseOver
 
-classCChosen:   add si,40h
+classCChosen:   add si,28h
 
 chooseOver:     mov di,si
                 inc di
@@ -156,15 +161,15 @@ chooseOver:     mov di,si
 nextrow:        mov cl,0ah
 
 ;display the seats
-   disploop1:   cmp [si],00h
+disploop1:      cmp [si],00h
                 jnz booked
                 mov dl,'-'
                 jmp show
 
-      booked:   mov dl,'X'
+booked:         mov dl,'X'
 
 ;show '-' if not booked and 'X' if booked
-        show:   mov ah,02h
+show:           mov ah,02h
                 int 21h
 
                 mov dl,' '
