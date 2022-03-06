@@ -46,12 +46,12 @@ endm
 code segment
 assume cs:code,ds:data
       
-      start:    
-                mov ax,data
+      start:    mov ax,data
                 mov ds,ax
-
-                printString welcomeString  
+;print menu
+       menu:    printString welcomeString  
                 printString newlineString
+
                 printString menuString  
                 printString newlineString  
                 printString trainAName
@@ -60,18 +60,12 @@ assume cs:code,ds:data
                 printString newlineString 
                 printString trainCName  
                 printString newlineString 
-                printString trainSelection  
-                
-                
-                ;print menu
-                printNewline
-       menu:           
+                printString trainSelection             
 
 ;choose train
 chooseTrain:    ;load train:no into currentlyChosenTrain 
                 call readInt 
                 mov currentlyChosenTrain,al
-                
 
 ;choose class
 chooseClass:    ;load class:no into currentlyChosenClass
@@ -154,6 +148,8 @@ nextrow:        mov cl,0ah
                 add si,02h
                 dec cl
                 jnz disploop1
+
+                printString newlineString
 
                 mov si,di
                 dec ch
