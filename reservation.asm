@@ -23,9 +23,9 @@ data segment
     trainCSeatsNumber db 3 dup(20) 
 
     ;variables to display booked/unbooked seats
-    trainASeats db 20 dup(0)  
-    trainBSeats db 20 dup(0)
-    trainCSeats db 20 dup(0)
+    trainASeats db 60 dup(0)  
+    trainBSeats db 60 dup(0)
+    trainCSeats db 60 dup(0)
 
     ;currently chosen items
     currentlyChosenTrain db ?
@@ -37,7 +37,7 @@ printString macro arg
     lea dx,arg
     mov ah,09h
     int 21h
-endm
+endm  
 
 ;code segment
 code segment
@@ -49,6 +49,7 @@ assume cs:code,ds:data
 
                 printString welcomeString
                 ;print menu
+                printNewline
        menu:           
 
 ;choose train
@@ -79,7 +80,59 @@ endp
 
 ;procedure to display seating
 displaySeats proc
+;load the appropriate location into si
+trainAChosen:   cmp currentlyChosenTrain,01h
+                jnz trainBChosen
+                lea si,trainASeats
+                jmp classAChosen
 
+trainBChosen:   cmp currentlyChosenTrain,02h
+                jnz trainCChosen
+                lea si,trainBSeats
+                jmp classAChosen
+
+trainCChosen:   lea si,trainCSeats
+                
+classAChosen:   cmp currentlyChosenClass,01h
+                jnz classBChosen
+                jmp chooseOver
+
+classBChosen:   cmp currentlyChosenClass,02h
+                jnz classCChosen
+                add si,20h
+                jmp chooseOver
+
+classCChosen:   add si,40h
+
+chooseOver:     mov di,si
+                inc di
+                mov ch,02h
+
+nextrow:        mov cl,0ah
+
+;display the seats
+   disploop1:   cmp [si],00h
+                jnz booked
+                mov dl,'-'
+                jmp show
+
+      booked:   mov dl,'X'
+
+;show '-' if not booked and 'X' if booked
+        show:   mov ah,02h
+                int 21h
+
+                mov dl,' '
+                mov ah,02h
+                int 21h
+
+                add si,02h
+                dec cl
+                jnz disploop1
+
+                mov si,di
+                dec ch
+                jnz nextrow
 ret
 endp
 
