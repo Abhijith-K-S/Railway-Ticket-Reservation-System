@@ -13,13 +13,21 @@
 data segment
     ;strings
     welcomeString db 0ah,0dh,'Welcome to Railway Ticket Reservation System','$'   
-    menuString db 0ah,0dh,'Please Select a Train to Book Tickets: $'
+    trainMenuString db 0ah,0dh,'Please Select a Train to Book Tickets: $'
     newlineString db 0ah,0dh,' $'   
     trainSelection db 0ah,0dh,'Enter Train number :$'                     
     trainAName db 0ah,0dh,'1:Train A $'
     trainBName db 0ah,0dh,'2:Train B $'
-    trainCName db 0ah,0dh,'3:Train C $'
-
+    trainCName db 0ah,0dh,'3:Train C $' 
+             
+    classMenuString db 0ah,0dh,'Please select a class  $'     
+    classSelection db 0ah,0dh,'Select a class : $'
+    classAName db 0ah,0dh,'1:CLASS A $' 
+    classBName db 0ah,0dh,'2:CLASS B $'
+    classCName db 0ah,0dh,'3:CLASS C $'  
+    
+    errorString db 0ah,0dh,'INVALID OPTION.PLEASE TRY AGAIN!!!$'
+   
     ;variables to store available seating information
     trainASeatsNumber db 3 dup(20)
     trainBSeatsNumber db 3 dup(20)   
@@ -52,7 +60,7 @@ assume cs:code,ds:data
        menu:    printString welcomeString  
                 printString newlineString
 
-                printString menuString  
+                printString trainMenuString  
                 printString newlineString  
                 printString trainAName
                 printString newlineString
@@ -68,18 +76,36 @@ chooseTrain:    ;load train:no into currentlyChosenTrain
                 mov currentlyChosenTrain,al
 
 ;choose class
-chooseClass:    ;load class:no into currentlyChosenClass
+ chooseClass: 
+ 
+               
 
-;display remaining seats no
-;read no of seats to book
-;on success, display ticket info
-;       -> go to main menu
-;       -> exit
+            printString newlineString
+            printString classMenuString  
+            printString newlineString  
+            printString classAName
+            printString newlineString
+            printString classBName
+            printString newlineString 
+            printString classCName  
+repeatClass:printString newlineString 
+            printString classSelection 
+           
 
-;if no seats - provide option
-;               -> go to class selection
-;               -> go to main menu
-;               -> exit
+              call readInt 
+              cmp al,04h
+              jc  chooseSeat
+          
+              printString errorString
+              jmp repeatClass
+ 
+  
+  
+           
+chooseSeat:    
+           mov currentlyChosenClass,al
+
+
 
 exit:           mov ah,4ch
                 int 21h 
@@ -159,3 +185,6 @@ endp
 
 code ends
 end start
+     
+     
+     
