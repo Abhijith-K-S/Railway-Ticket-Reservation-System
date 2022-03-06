@@ -17,10 +17,19 @@ data segment
     trainBName db 0ah,0dh,'Train B'
     trainCName db 0ah,0dh,'Train C'
 
-    ;variables to store seating information
-    trainASeats db 3 dup(?)
-    trainBSeats db 3 dup(?)   
-    trainCSeats db 3 dup(?)   
+    ;variables to store available seating information
+    trainASeatsNumber db 3 dup(20)
+    trainBSeatsNumber db 3 dup(20)   
+    trainCSeatsNumber db 3 dup(20) 
+
+    ;variables to display booked/unbooked seats
+    trainASeats db 20 dup(0)  
+    trainBSeats db 20 dup(0)
+    trainCSeats db 20 dup(0)
+
+    ;currently chosen items
+    currentlyChosenTrain db ?
+    currentlyChosenClass db ?
 data ends
     
 ;macro to print strings    
@@ -32,16 +41,21 @@ endm
 
 ;code segment
 code segment
+assume cs:code,ds:data
+      
+      start:    
+                mov ax,data
+                mov ds,ax
 
-start: printString welcomeString
-;print menu
-menu:           
+                printString welcomeString
+                ;print menu
+       menu:           
 
 ;choose train
-chooseTrain:    ;load train:no into ah register
+chooseTrain:    ;load train:no into currentlyChosenTrain
 
 ;choose class
-chooseClass:    ;load class:no into al register
+chooseClass:    ;load class:no into currentlyChosenClass
 
 ;display remaining seats no
 ;read no of seats to book
@@ -56,6 +70,18 @@ chooseClass:    ;load class:no into al register
 
 exit:           mov ah,4ch
                 int 21h
+
+;procedure to read integer
+readInt proc
+
+ret
+endp
+
+;procedure to display seating
+displaySeats proc
+
+ret
+endp
 
 code ends
 end start
