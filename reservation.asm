@@ -33,9 +33,9 @@ data segment
     errorString db 0ah,0dh,'INVALID OPTION.PLEASE TRY AGAIN!!!$'
    
     ;variables to store available seating information
-    trainASeatsNumber db 3 dup(20)
-    trainBSeatsNumber db 3 dup(20)   
-    trainCSeatsNumber db 3 dup(20) 
+    trainASeatsNumber db 3 dup(14)
+    trainBSeatsNumber db 3 dup(14)   
+    trainCSeatsNumber db 3 dup(14) 
 
     ;variables to display booked/unbooked seats
     trainASeats db 60 dup(0)  
@@ -44,7 +44,14 @@ data segment
 
     ;currently chosen items
     currentlyChosenTrain db ?
-    currentlyChosenClass db ?
+    currentlyChosenClass db ? 
+    
+    temp dw ?           
+    availableSeats db 0ah,0dh,'No. of seats available: $'
+    numOfSeatsToBeBooked db 0ah,0dh,'Enter no .of seats to be booked,[max 5]: $'    
+    limitOver db 0ah,0dh,'Maximum limit exceeded,give less than 5: $'
+    tempCount dw ?    
+    printVal db ? 
 data ends
     
 ;macro to print strings    
@@ -110,7 +117,21 @@ chooseClass:    printString newlineString
 noErrorClass:   mov currentlyChosenClass,al
 
                 printString newlineString
-                call displaySeats
+                call displaySeats 
+                mov si,temp
+                mov di,tempCount
+                printString availableSeats
+                mov ah,[di]     
+                mov printVal,ah
+                call printInt
+repeatBook:     printString newlineString 
+                printString numOfSeatsToBeBooked 
+                call readInt  
+                cmp al,05h
+                jc exit
+                printString limitOver
+                jmp repeatBook
+                
 
 exit:           mov ah,4ch
                 int 21h 
@@ -126,22 +147,51 @@ readInt proc
     jz rn
     sub al,07h
  rn:ret
-endp
+endp         
 
+;procedure to print integer
+printInt proc  
+    mov dl,printVal
+    and dl,0F0h
+    mov cl,04h
+    shr dl,cl
+    add dl,30h
+    cmp dl,39h
+    jc rnu
+    jz rnu  
+    add dl,07h
+ rnu:mov ah,02h
+    int 21h
+    mov dl,printVal
+    and dl,0Fh
+    add dl,30h
+    cmp dl,39h
+    jc rnp
+    jz rnp  
+    add dl,07h
+ rnp:mov ah,02h
+     int 21h
+ ret
+endp   
+    
+    
 ;procedure to display seating
 displaySeats proc
 ;load the appropriate location into si
 trainAChosen:   cmp currentlyChosenTrain,01h
                 jnz trainBChosen
-                lea si,trainASeats
+                lea si,trainASeats   
+                lea di,trainASeatsNumber
                 jmp classAChosen
 
 trainBChosen:   cmp currentlyChosenTrain,02h
                 jnz trainCChosen
                 lea si,trainBSeats
+                lea di,trainBSeatsNumber
                 jmp classAChosen
 
 trainCChosen:   lea si,trainCSeats
+                lea di,trainCSeatsNumber
                 
 classAChosen:   cmp currentlyChosenClass,01h
                 jnz classBChosen
@@ -150,11 +200,15 @@ classAChosen:   cmp currentlyChosenClass,01h
 classBChosen:   cmp currentlyChosenClass,02h
                 jnz classCChosen
                 add si,14h
+                add di,01h
                 jmp chooseOver
 
-classCChosen:   add si,28h
+classCChosen:   add si,28h  
+                add di,02h
 
-chooseOver:     mov di,si
+chooseOver:     mov tempCount,di
+                mov di,si 
+                mov temp,si
                 inc di
                 mov ch,02h
 
