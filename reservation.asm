@@ -12,10 +12,13 @@
 ;data segment
 data segment
     ;strings
-    welcomeString db 0ah,0dh,'Welcome to Railway Ticket Reservation System','$'
-    trainAName db 0ah,0dh,'Train A'
-    trainBName db 0ah,0dh,'Train B'
-    trainCName db 0ah,0dh,'Train C'
+    welcomeString db 0ah,0dh,'Welcome to Railway Ticket Reservation System','$'   
+    menuString db 0ah,0dh,'Please Select a Train to Book Tickets: $'
+    newlineString db 0ah,0dh,' $'   
+    trainSelection db 0ah,0dh,'Enter Train number :$'                     
+    trainAName db 0ah,0dh,'1:Train A $'
+    trainBName db 0ah,0dh,'2:Train B $'
+    trainCName db 0ah,0dh,'3:Train C $'
 
     ;variables to store available seating information
     trainASeatsNumber db 3 dup(20)
@@ -47,12 +50,27 @@ assume cs:code,ds:data
                 mov ax,data
                 mov ds,ax
 
-                printString welcomeString
+                printString welcomeString  
+                printString newlineString
+                printString menuString  
+                printString newlineString  
+                printString trainAName
+                printString newlineString
+                printString trainBName
+                printString newlineString 
+                printString trainCName  
+                printString newlineString 
+                printString trainSelection  
+                
+                
                 ;print menu
        menu:           
 
 ;choose train
-chooseTrain:    ;load train:no into currentlyChosenTrain
+chooseTrain:    ;load train:no into currentlyChosenTrain 
+                call readInt 
+                mov currentlyChosenTrain,al
+                
 
 ;choose class
 chooseClass:    ;load class:no into currentlyChosenClass
@@ -69,12 +87,19 @@ chooseClass:    ;load class:no into currentlyChosenClass
 ;               -> exit
 
 exit:           mov ah,4ch
-                int 21h
+                int 21h 
+                
 
 ;procedure to read integer
-readInt proc
-
-ret
+readInt proc   
+    mov ah,01h
+    int 21h
+    sub al,30h
+    cmp al,09h
+    jc rn
+    jz rn
+    sub al,07h
+ rn:ret
 endp
 
 ;procedure to display seating
