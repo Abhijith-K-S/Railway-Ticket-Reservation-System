@@ -13,7 +13,8 @@
 data segment
     ;strings
     newlineString db 0ah,0dh,' $'  
-    welcomeString db 0ah,0dh,'Welcome to Railway Ticket Reservation System','$'   
+    welcomeString db 0ah,0dh,'Welcome to Railway Ticket Reservation System','$' 
+    thankYouString db 0ah,0dh,'Thank you for using our system $'  
 
     ;train menu
     trainMenuString db 0ah,0dh,'Please Select a Train to Book Tickets: $' 
@@ -187,7 +188,7 @@ repeatBook:     printString newlineString
                 printString numOfSeatsToBeBooked 
                 
                 call readInt  
-                cmp al,05h
+                cmp al,06h
                 jc proceedBooking
                 printString limitOver
                 jmp repeatBook
@@ -217,6 +218,7 @@ printSeats:     printChar chosenTrainID
 whatNext:       printString newlineString
                 printString anotherTicket
                 printString exitProgram
+                printString newlineString
                 printString choiceRead
                 call readInt
 ;check for errors 
@@ -229,7 +231,9 @@ whatNext:       printString newlineString
 noProbs:        cmp al,01h
                 jz menu 
 
-exit:           mov ah,4ch
+exit:           printString newlineString
+                printString thankYouString
+                mov ah,4ch
                 int 21h 
 ;end of main program               
 
