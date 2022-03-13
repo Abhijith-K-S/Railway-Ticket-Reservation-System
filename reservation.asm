@@ -4,7 +4,7 @@
 ;Done by:
 ;   -> Abhijith K S
 ;   -> Jayasankar J N
-;   -> Rohit Prakash
+;   -> Rohith Prakash
 ;   -> Sreehari M S
 ;
 ;/////////////////////////////////////////////////////////////
